@@ -7,23 +7,30 @@
       function initialize() {
         earth = new WE.map('earth_div');
         earth.setView([46.8011, 8.2266], 3);
-        WE.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-          attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>'
+        //Tilelayer, pretty much the texture of the map
+        WE.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {  //tile Map was provided by openstreetsmap open source 
+          tileSize: 256,
+          bounds: [[-85, -180], [85, 180]],
+          minZoom: 0,
+          maxZoom: 10,
+          attribution: '© OpenStreetMap contributors',
+          //tms: true
         }).addTo(earth);
 
         // Start a simple rotation animation
-        var before = null;
-        requestAnimationFrame(function animate(now) {
-            var c = earth.getPosition();
-            var elapsed = before? now - before: 0;
-            before = now;
-            earth.setCenter([c[0], c[1] + 0.1*(elapsed/30)]);
-            requestAnimationFrame(animate);
-        });
+        // what are these var names
+        // var before = null;
+        // requestAnimationFrame(function animate(now) {
+        //     var c = earth.getPosition();
+        //     var elapsed = before? now - before: 0;
+        //     before = now;
+        //     earth.setCenter([c[0], c[1] + 0.1*(elapsed/30)]);
+        //     requestAnimationFrame(animate);
+        // });
       }
     </script>
     <style>
-      html, body{padding: 0; margin: 0;}
+      html, body{padding: 0; background-color: black; margin: 0;}
       #earth_div{ top: 0; right: 0; bottom: 0; left: 0; position: absolute !important;}
     </style>
     <title>WebGL Earth API v2 examples: Rotating globe animation</title>
