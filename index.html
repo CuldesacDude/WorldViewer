@@ -1,8 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://www.webglearth.com/v2/api.js"></script>
     <script>
       //var earth;
       function initialize() {
@@ -14,13 +13,14 @@
           .then(data => {
             data.forEach(country => {
               const name = country.name.common;
-              const capitalCoords = country.capital ? country.latlng : null;
+              const capitalCoords = country.capital ? country.latlng : [0,0];
               countryCapitalCoords.set(name, capitalCoords);
             });
             console.log(countryCapitalCoords);
           })
           .catch(error => console.error(error));
-
+        
+        
         fetch('https://flagcdn.com/en/codes.json')
           .then(response => response.json())
           .then(data => {
@@ -28,21 +28,26 @@
               const flagUrl = `https://flagcdn.com/160x120/${code.toLowerCase()}.png`;
               countryFlags.set(name, flagUrl);
             }
-            console.log(countryFlags);
+            //console.log(countryFlags);
             // Now you can use the countryFlags Map to display flags on a map
             // For example, if you're using Leaflet.js:
-            const map = L.map('map', {
-              center: [-29.50, 145],
-              zoom: 3.5
-            });
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            const map = WE.map('map', {center: [-29.50, 145], zoom: 3.5 });
+            
+            WE.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
               attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
               maxZoom: 18
-            }).addTo(map);
-
-            for (const [name, flagUrl] of countryFlags.entries()) {
-              const latlng = countryCapitalCoords.get(name);
-              const marker = L.marker(latlng).addTo(map);
+            }).addTo(map)
+            for (var [name, flagUrl] of countryFlags.entries()) {
+              console.log(name);
+              
+                
+              if(countryCapitalCoords.get(name) != null){
+                var latlng = countryCapitalCoords.get(name);
+              }
+              
+              
+              console.log(latlng);
+              var marker = WE.marker(latlng).addTo(map);
               marker.bindPopup(`<h3>${name}</h3><img src="${flagUrl}" alt="${name} flag">`);
             }
           })
@@ -50,12 +55,8 @@
       }
     </script>
     <style>
-      body{padding: 0; background-color: black; margin: 0;}
-      #map {
-        width: 100vw;
-        height: 100vh; 
-        position: relative;
-      }  /*previous position: absolute*/
+      html,body{padding: 0; background-color: black; margin: 0;}
+      #map {top: 0; right: 0; bottom: 0; left: 0; background-color: #000; position: relative !important;}
       /* Add a black background color to the top navigation */
       .topnav {
         background-color: #333;
@@ -97,8 +98,5 @@
       <a href="#contact">Contact</a>
       <a href="#about">About</a>
     </div>
-
-    
-    
   </body>
 </html>
