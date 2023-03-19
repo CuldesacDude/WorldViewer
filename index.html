@@ -1,37 +1,61 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <script src="https://www.webglearth.com/v2/api.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
     <script>
-      var earth;
+      //var earth;
       function initialize() {
-        earth = new WE.map('earth_div');
-        earth.setView([46.8011, 8.2266], 1);
-        //Tilelayer, pretty much the texture of the map
-        WE.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {  //tile Map was provided by openstreetsmap open source 
-          tileSize: 256,
-          bounds: [[-85, -180], [85, 180]],
-          minZoom: 0,
-          maxZoom: 10,
-          attribution: '© OpenStreetMap contributors',
-          //tms: true // dont know what this is for
-        }).addTo(earth);
-        
-        // Start a simple rotation animation
-        // what are these var names
-        // var before = null;
-        // requestAnimationFrame(function animate(now) {
-        //     var c = earth.getPosition();
-        //     var elapsed = before? now - before: 0;
-        //     before = now;
-        //     earth.setCenter([c[0], c[1] + 0.1*(elapsed/30)]);
-        //     requestAnimationFrame(animate);
-        // });
+        const countryFlags = new Map();
+        // retrieves a map with all the countries.
+        const countryCapitalCoords = new Map();
+        fetch('https://restcountries.com/v3.1/all')
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(country => {
+              const name = country.name.common;
+              const capitalCoords = country.capital ? country.latlng : null;
+              countryCapitalCoords.set(name, capitalCoords);
+            });
+            console.log(countryCapitalCoords);
+          })
+          .catch(error => console.error(error));
+
+        fetch('https://flagcdn.com/en/codes.json')
+          .then(response => response.json())
+          .then(data => {
+            for (const [code, name] of Object.entries(data)) {
+              const flagUrl = `https://flagcdn.com/160x120/${code.toLowerCase()}.png`;
+              countryFlags.set(name, flagUrl);
+            }
+            console.log(countryFlags);
+            // Now you can use the countryFlags Map to display flags on a map
+            // For example, if you're using Leaflet.js:
+            const map = L.map('map', {
+              center: [-29.50, 145],
+              zoom: 3.5
+            });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
+              maxZoom: 18
+            }).addTo(map);
+
+            for (const [name, flagUrl] of countryFlags.entries()) {
+              const latlng = countryCapitalCoords.get(name);
+              const marker = L.marker(latlng).addTo(map);
+              marker.bindPopup(`<h3>${name}</h3><img src="${flagUrl}" alt="${name} flag">`);
+            }
+          })
+          .catch(error => console.error(error));        
       }
     </script>
     <style>
-      html, body{padding: 0; background-color: black; margin: 0;}
-      #earth_div{ top: 0; right: 0; bottom: 0; left: 0; position: relative !important;}  /*previous position: absolute*/
+      body{padding: 0; background-color: black; margin: 0;}
+      #map {
+        width: 100vw;
+        height: 100vh; 
+        position: relative;
+      }  /*previous position: absolute*/
       /* Add a black background color to the top navigation */
       .topnav {
         background-color: #333;
@@ -65,7 +89,9 @@
     <meta name="description" content="Free and open-source 3D digital globe for web and mobile devices. This example shows how to rotate the Earth in a beautiful animation.">
   </head>
   <body onload="initialize()">
-    <div id="earth_div"></div>
+    <!-- division for the world view map -->
+    <div id="map"></div>
+    <!-- Tool bar -->
     <div class="topnav">
       <a class="active" href="#home">Home</a>
       <a href="#contact">Contact</a>
