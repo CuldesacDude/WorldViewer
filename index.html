@@ -23,10 +23,6 @@
           })
           .catch(error => console.error(error));
 
-
-
-        
-
         fetch('https://restcountries.com/v3.1/all')
           .then(response => response.json())
           .then(data => {
@@ -50,7 +46,7 @@
           })
           .catch(error => console.error(error));
 
-         
+        /*obtaining data from flagcdn */
         fetch('https://flagcdn.com/en/codes.json')
           .then(response => response.json())
           .then(data => {
@@ -76,7 +72,8 @@
               }
               var marker = WE.marker(latlng).addTo(map);
 
-              marker.bindPopup(`<h3>${name}</h3><img src="${flagUrl}" alt="${name} flag" style="max-width:100px;max-height:60px;"><a>"something${name}"</a>`); 
+              marker.bindPopup(`<h3>${name}</h3><img src="${flagUrl}" alt="${name} 
+              flag" style="max-width:100px;max-height:60px;"><a>" ${name}"</a>`); 
             }
           })
           .catch(error => console.error(error));  
